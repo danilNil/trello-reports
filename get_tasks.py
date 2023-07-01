@@ -1,5 +1,6 @@
 import json
 import csv
+import re
 from datetime import datetime
 
 def extract_tasks_from_trello(json_file):
@@ -8,6 +9,12 @@ def extract_tasks_from_trello(json_file):
 
     tasks = []
     for card in data['cards']:
+
+        # Skip cards with the label 'infra'
+        labels = [label['name'] for label in card['labels']]
+        if 'infra' in labels:
+            continue
+
         task = {}
         task['name'] = card['name']
         task['description'] = card['desc']
@@ -21,6 +28,13 @@ def extract_tasks_from_trello(json_file):
             task['done'] = True
         else:
             task['done'] = False
+
+        # Extract estimate from card name using regular expression
+        match = re.search(r'\[(\d+)\]', task['name'])
+        if match:
+            task['estimate'] = int(match.group(1))
+        else:
+            task['estimate'] = None
 
         # Find the first action where the task was moved to the desired list
         for action in data['actions']:
@@ -44,7 +58,7 @@ def check_if_done(listId):
     return listId == listDoneId1 or listId == listDoneId2
 
 def save_tasks_to_csv(tasks, csv_file):
-    fieldnames = ['Task Name', 'URL', 'Archived', 'Complete Date']
+    fieldnames = ['Task Name', 'URL', 'Archived', 'Complete Date', 'Estimate']
 
     with open(csv_file, 'w', newline='') as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
@@ -55,6 +69,7 @@ def save_tasks_to_csv(tasks, csv_file):
                 'URL': task['short_url'],
                 'Archived': task['closed'],
                 'Complete Date': task['complete_date'],
+                'Estimate': task['estimate'],
             })
 
 
