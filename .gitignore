@@ -160,3 +160,4 @@ cython_debug/
 #.idea/
 tasks.csv
 board.json
+trello_board.csv
