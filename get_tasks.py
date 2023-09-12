@@ -41,15 +41,9 @@ def extract_tasks_from_trello(json_file):
         for action in data['actions']:
             if action['type'] == 'updateCard' and action['data']['card']['id'] == card['id']:
                 if 'listAfter' in action['data']:
-                    print(task['name'], action['data']['listAfter']['name'], datetime.strptime(action['date'], "%Y-%m-%dT%H:%M:%S.%fZ"))
-                    print("/n")
                     if check_if_ready_for_demo(action['data']['listAfter']['id']):
                         move_date = datetime.strptime(action['date'], "%Y-%m-%dT%H:%M:%S.%fZ")
                         task['complete_date'] = move_date.strftime("%Y-%m-%d %H:%M:%S")
-                        print('--')
-                        print(task['name'], task['complete_date'])
-                        print("--")
-                        # break
 
         if task['complete_date'] == '':
             for action in data['actions']:
@@ -58,10 +52,10 @@ def extract_tasks_from_trello(json_file):
                         if check_if_done(action['data']['listAfter']['id']):
                             move_date = datetime.strptime(action['date'], "%Y-%m-%dT%H:%M:%S.%fZ")
                             task['complete_date'] = move_date.strftime("%Y-%m-%d %H:%M:%S")
-                            print('--')
-                            print(task['name'], task['complete_date'])
-                            print("--")
-                            # break
+
+        print('--')
+        print(task['name'], task['complete_date'])
+        print("--")
 
         tasks.append(task)
 
